@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "15379790",
+      "name": "信息管理",
+      "font_class": "xinxiguanli",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    }
+  ]
+}
