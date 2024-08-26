@@ -1,13 +1,13 @@
 <template>
-    <el-table :data="tableStore().teacherInfo" height="460" :cell-style="{ textAlign: 'center'}" 
+    <el-table :data="tableStore().adminInfo" :cell-style="{ textAlign: 'center'}" 
     :header-cell-style="{ 'text-align': 'center' }" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :header-row-style="{ 'background-color': '#f8f8f8' }"></el-table-column>
         <el-table-column prop="id" label="序号" sortable ></el-table-column>
-        <el-table-column prop="userName" label="用户名" ></el-table-column>
+        <el-table-column prop="username" label="用户名" ></el-table-column>
         <el-table-column prop="name" label="姓名"></el-table-column>
         <el-table-column label="电话号码" width="130">
             <template v-slot="scope">
-                {{ scope.row.phoneNumber ? scope.row.phoneNumber : '--' }}
+                {{ scope.row.phone_number ? scope.row.phone_number : '--' }}
             </template>
         </el-table-column>
         <el-table-column label="邮箱" width="180">
@@ -15,19 +15,14 @@
                 {{ scope.row.email ? scope.row.email : '--' }}
             </template>
         </el-table-column>
-        <el-table-column prop="imageData" label="头像">
+        <el-table-column prop="image_data" label="头像">
             <template v-slot="scope" class="avatar-uploader">
                 <div style="display: flex; justify-content: center; align-items: center;">
-                    <img :src="scope.row.imageData" alt="加载失败" class="avatar avatar-uploader" />
+                    <img :src="scope.row.image_data" alt="加载失败" class="avatar avatar-uploader" />
                 </div>
             </template>
         </el-table-column>
         <el-table-column prop="role" label="角色"></el-table-column>
-        <el-table-column prop="title" label="职称">
-            <template v-slot="scope">
-                {{ scope.row.title ? scope.row.title : '--' }}
-            </template>
-        </el-table-column>
         <el-table-column min-width="140px">
             <template v-slot="scope">
                 <el-button type="primary" size="small" @click="HandleEdit(scope.row)">编辑</el-button>
@@ -37,29 +32,26 @@
     </el-table>
 
     <el-dialog v-model="editDialogVisible">
-        <el-form :model="newTeacher" label-width="auto" :rules="rules" ref="ruleFormRef" @keyup.enter="OnSubmit()">
-            <el-form-item label="用户名：" prop="userName">
-                <el-input v-model="newTeacher.userName" clearable></el-input>
+        <el-form :model="newAdmin" label-width="auto" :rules="rules" ref="ruleFormRef" @keyup.enter="OnSubmit(ruleFormRef)">
+            <el-form-item label="用户名：" prop="username">
+                <el-input v-model="newAdmin.username" clearable></el-input>
             </el-form-item>
             <el-form-item label="姓名：" prop="name">
-                <el-input v-model="newTeacher.name" clearable/>
+                <el-input v-model="newAdmin.name" clearable/>
             </el-form-item>
-            <el-form-item label="电话号码：" prop="phoneNumber">
-                <el-input v-model="newTeacher.phoneNumber" clearable/>
+            <el-form-item label="电话号码：" prop="phone_number">
+                <el-input v-model="newAdmin.phone_number" clearable/>
             </el-form-item>
             <el-form-item label="头像：" prop="avatarUrl">
-                <el-upload class="avatar-uploader" :limit="1" action="http://localhost:5172/api/TeacherAvatars" :show-file-list="false" :before-upload="BeforeAvatarUpload " :on-error="HandleAvatarError">
-                    <img :src="newTeacher.avatarUrl" alt="加载失败" class="avatar avatar-uploader" />
+                <el-upload class="avatar-uploader" :limit="1" action="http://localhost:5172/api/AdminAvatars/upload" :show-file-list="false" :before-upload="BeforeAvatarUpload " :on-error="HandleAvatarError">
+                    <img :src="newAdmin.avatarUrl" alt="加载失败" class="avatar avatar-uploader" />
                 </el-upload>
             </el-form-item>
             <el-form-item label="邮箱：" prop="email">
-                <el-input v-model="newTeacher.email" clearable/>
-            </el-form-item>
-            <el-form-item label="职称：" prop="title">
-                <el-input v-model="newTeacher.title" clearable/>
+                <el-input v-model="newAdmin.email" clearable/>
             </el-form-item>
             <el-form-item>   
-                <el-button type="primary" @click="OnSubmit()">提交</el-button>
+                <el-button type="primary" @click="OnSubmit(ruleFormRef)">提交</el-button>
                 <el-button @click="HandleReset()">重置</el-button>
             </el-form-item>
         </el-form>
@@ -73,45 +65,46 @@ import { avatarEmits, ElMessage,ElTable} from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import { reactive, watch } from 'vue';
 import { ref } from 'vue';
-import type { FormRules, UploadProps} from 'element-plus'
+import type { FormInstance, FormRules, UploadProps} from 'element-plus'
 import tableStore from '@/stores/table'
 import '@/assets/css/content.css'
+import { el } from 'element-plus/es/locales.mjs';
 
 const editDialogVisible = ref(false)
 
-let newTeacher = reactive({
+let newAdmin = reactive({
     id: '',
-    userName: '',
+    username: '',
     name: '',
-    phoneNumber: '',
+    phone_number: '',
     email: '',
-    role: '教师',
-    title: '',
+    role: '管理员',
     avatarUrl:''
 })
 
-const originalTeacher = reactive({
+const originalAdmin = reactive({
     id: '',
-    userName: '',
+    username: '',
     name: '',
-    phoneNumber: '',
+    phone_number: '',
     email: '',
-    role: '教师',
-    avatarUrl:'',
-    title: ''
+    role: '管理员',
+    avatarUrl:''
 });
 
 interface RuleForm {
-  userName: string,
+  username: string,
   name: string,
-  phoneNumber: string,
+  phone_number: string,
   email: string
 }
 
+const ruleFormRef = ref<FormInstance>()
+
 const rules = reactive<FormRules<RuleForm>>({
-    userName:[
+    username:[
         {required: true, message: '请输入用户名', trigger: 'blur'},
-        { min: 3, max: 12, message: '长度在3到12之间', trigger: 'blur' }
+        { min: 3, max: 20, message: '长度在3到12之间', trigger: 'blur' }
     ],
     name:[
         {required: true, message: '请输入姓名', trigger: 'blur'},
@@ -130,7 +123,7 @@ const BeforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   }
   const reader = new FileReader();  
   reader.onload = (e) => {
-    newTeacher.avatarUrl = (e.target as FileReader).result as string;
+    newAdmin.avatarUrl = (e.target as FileReader).result as string;
   };
   reader.readAsDataURL(rawFile);
   // 阻止文件上传
@@ -138,10 +131,10 @@ const BeforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 }
 
 const HandleDelete = (id: number) => {
-    axios.delete(`http://localhost:5172/api/Teachers/${id}`)
+    axios.delete(`http://localhost:5172/api/AdminInfo/${id}`)
     .then(()=>{
         Promise.all([
-            tableStore().UpdateTeacherInfo(),
+            tableStore().UpdateAdminInfo(),
             ElMessage.success("删除成功！")
         ])
     })
@@ -153,53 +146,50 @@ const HandleDelete = (id: number) => {
 
 
 const HandleEdit = (row: any) => {
-    newTeacher.userName = row.userName;
-    newTeacher.name = row.name;
-    newTeacher.phoneNumber = row.phoneNumber;
-    newTeacher.email = row.email;
-    newTeacher.id = row.id
-    newTeacher.avatarUrl = row.imageData
-    newTeacher.title = row.title
+    newAdmin.username = row.username;
+    newAdmin.name = row.name;
+    newAdmin.phone_number = row.phone_number;
+    newAdmin.email = row.email;
+    newAdmin.id = row.id
+    newAdmin.avatarUrl = row.image_data
     // 保存初始数据,以便重置按钮对原来数据进行恢复
-    originalTeacher.id = row.id;
-    originalTeacher.userName = row.userName;
-    originalTeacher.name = row.name;
-    originalTeacher.phoneNumber = row.phoneNumber;
-    originalTeacher.email = row.email;
-    originalTeacher.avatarUrl = row.imageData;
-    originalTeacher.title = row.title
+    originalAdmin.id = row.id;
+    originalAdmin.username = row.username;
+    originalAdmin.name = row.name;
+    originalAdmin.phone_number = row.phone_number;
+    originalAdmin.email = row.email;
+    originalAdmin.avatarUrl = row.image_data;
+
     editDialogVisible.value = true;
 }
 
-const OnSubmit = () => {
-    if (!newTeacher.avatarUrl) {
+const OnSubmit = async(formEl: FormInstance | undefined) => {
+    if (!newAdmin.avatarUrl) {
     ElMessage.warning('请先上传头像');
     return;
   }
-
-  let TeacherData = {
-        id: newTeacher.id,
-        username: newTeacher.userName,
-        name: newTeacher.name,
-        phoneNumber: newTeacher.phoneNumber,
-        email: newTeacher.email,
-        role: newTeacher.role,
-        title: newTeacher.title
+  if (!formEl) return
+  await formEl.validate();
+  let adminData = {
+        id: newAdmin.id,
+        username: newAdmin.username,
+        name: newAdmin.name,
+        phone_number: newAdmin.phone_number,
+        email: newAdmin.email,
+        role: newAdmin.role
     };
-    axios.put(`http://localhost:5172/api/Teachers/${TeacherData.id}`, TeacherData)
+    axios.put(`http://localhost:5172/api/AdminInfo/${adminData.id}`, adminData)
     .then(() => {
         const image = {
-            id: TeacherData.id,
-            imageData: newTeacher.avatarUrl
+            id: adminData.id,
+            image_data: newAdmin.avatarUrl
         }
-        axios.put(`http://localhost:5172/api/TeacherAvatars/${TeacherData.id}`, image)
+        axios.put(`http://localhost:5172/api/AdminAvatars/${adminData.id}`, image)
         .then(() => {
             editDialogVisible.value = false;
-            Promise.all([
-                tableStore().UpdateTeacherInfo(),
-                ElMessage.success("修改成功！")
-            ])
-            newTeacher.avatarUrl = ''
+            tableStore().UpdateAdminInfo()
+            ElMessage.success("修改成功！");
+            newAdmin.avatarUrl = ''
         })
         .catch(() => {
             ElMessage.error("修改失败！");
@@ -212,12 +202,11 @@ const handleSelectionChange = (selection: []) => {
 };
 
 const HandleReset = () => {
-    newTeacher.id = originalTeacher.id;
-    newTeacher.userName = originalTeacher.userName;
-    newTeacher.name = originalTeacher.name;
-    newTeacher.phoneNumber = originalTeacher.phoneNumber;
-    newTeacher.email = originalTeacher.email;
-    newTeacher.avatarUrl = originalTeacher.avatarUrl;
-    newTeacher.title = originalTeacher.title
+    newAdmin.id = originalAdmin.id;
+    newAdmin.username = originalAdmin.username;
+    newAdmin.name = originalAdmin.name;
+    newAdmin.phone_number = originalAdmin.phone_number;
+    newAdmin.email = originalAdmin.email;
+    newAdmin.avatarUrl = originalAdmin.avatarUrl;
 }
 </script>

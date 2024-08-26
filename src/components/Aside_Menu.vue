@@ -1,7 +1,8 @@
+<!-- 侧边菜单栏 -->
 <template>
     <el-menu id="menu" index="1" :default-active="$route.path" class="el-menu-vertical-demo" @mouseover="SetCollapse(false)"
             @mouseleave="SetCollapse(true)" :collapse="isCollapse" :collapse-transition="false" router>
-            <el-menu-item index="/">
+            <el-menu-item index="/home">
                 <el-icon class="iconfont icon-zhuye"></el-icon>
                 <span>系统首页</span>
             </el-menu-item>
@@ -11,7 +12,7 @@
                     <span>信息管理</span>
                 </template>
                 <el-menu-item index="/announce">
-                    <span>公告信息</span>
+                    <span>教务通知</span>
                 </el-menu-item>
             </el-sub-menu>
             <el-sub-menu index="3">
@@ -24,6 +25,9 @@
                 </el-menu-item>
                 <el-menu-item index="/teacherInfo">
                     <span>教师信息</span>
+                </el-menu-item>
+                <el-menu-item index="/studentInfo">
+                    <span>学生信息</span>
                 </el-menu-item>
             </el-sub-menu>
         </el-menu>

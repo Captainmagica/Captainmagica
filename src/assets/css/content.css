@@ -71,7 +71,7 @@ line-height: 20px;
 .el-aside {
 background-color: white;
 width: 63.18px;
-height: calc(100vh - 44px);
+height: 100vh;
 overflow: hidden;
 transition: width 0.15s;
 -webkit-transition: width 0.15s;
@@ -85,6 +85,7 @@ height: 100%;
 }
 
 main#main {
+    height: calc(100vh - 44px);
     width: calc(100% - 63.18px);
     margin: 5px;
     padding: 0;
@@ -222,6 +223,13 @@ main#main {
     display: block;
   }
 
-  
+  .el-table{
+    height: calc(100vh - 170px);
+  }
+  .card{
+    box-shadow:0 2px 5px 0 rgba(0,0,0,.1)
+  }
 
-  
+  .el-textarea__inner{
+    caret-color: #409EFF;
+  }

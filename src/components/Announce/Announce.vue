@@ -7,19 +7,14 @@
             <ManageButton />
         </div>
         <div class="main-bottom">
-            <AdminInfoTable />
+            <AnnounceTable />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import SearchInput from '@/components/SearchAdmin.vue'
-import ManageButton from './AdminManage_Button.vue'
-import AdminInfoTable from './Admin_InfoTable.vue'
-
-
-import '@/assets/css/content.css'
-
-
+import SearchInput from '@/components/Announce/SearchInput.vue'
+import ManageButton from '@/components/Announce/ManageButton.vue'
+import AnnounceTable from './AnnounceTable.vue';
 
 </script>
