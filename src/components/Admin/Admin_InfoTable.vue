@@ -1,5 +1,5 @@
 <template>
-    <el-table :data="tableStore().adminInfo" :cell-style="{ textAlign: 'center'}" 
+    <el-table :data="admin.adminInfo" :cell-style="{ textAlign: 'center'}" 
     :header-cell-style="{ 'text-align': 'center' }" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :header-row-style="{ 'background-color': '#f8f8f8' }"></el-table-column>
         <el-table-column prop="id" label="序号" sortable ></el-table-column>
@@ -51,8 +51,12 @@
                 <el-input v-model="newAdmin.email" clearable/>
             </el-form-item>
             <el-form-item>   
-                <el-button type="primary" @click="OnSubmit(ruleFormRef)">提交</el-button>
-                <el-button @click="HandleReset()">重置</el-button>
+                <template #default>
+                        <div style="display:flex; justify-content: center; align-items: center; width: 100%;">
+                            <el-button type="primary" @click="OnSubmit(ruleFormRef)">提交</el-button>
+                            <el-button @click="HandleReset()">重置</el-button>
+                        </div>
+                </template>       
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -61,18 +65,17 @@
 
 <script lang="ts" setup>
 import axios from 'axios'
-import { avatarEmits, ElMessage,ElTable} from 'element-plus';
-import { Plus } from '@element-plus/icons-vue';
+import { ElMessage,ElTable} from 'element-plus';
 import { reactive, watch } from 'vue';
 import { ref } from 'vue';
 import type { FormInstance, FormRules, UploadProps} from 'element-plus'
-import tableStore from '@/stores/table'
+import { useAdminStore } from '@/stores/AdminStore';
 import '@/assets/css/content.css'
-import { el } from 'element-plus/es/locales.mjs';
+import type { Admin } from '@/stores/AdminStore';
 
 const editDialogVisible = ref(false)
-
-let newAdmin = reactive({
+const admin = useAdminStore()
+let newAdmin = reactive<Admin>({
     id: '',
     username: '',
     name: '',
@@ -82,7 +85,7 @@ let newAdmin = reactive({
     avatarUrl:''
 })
 
-const originalAdmin = reactive({
+const originalAdmin = reactive<Admin>({
     id: '',
     username: '',
     name: '',
@@ -103,12 +106,12 @@ const ruleFormRef = ref<FormInstance>()
 
 const rules = reactive<FormRules<RuleForm>>({
     username:[
-        {required: true, message: '请输入用户名', trigger: 'blur'},
-        { min: 3, max: 20, message: '长度在3到12之间', trigger: 'blur' }
+        {required: true, message: '请输入用户名', trigger: 'change'},
+        { min: 3, max: 20, message: '长度在3到20之间', trigger: 'change' }
     ],
     name:[
-        {required: true, message: '请输入姓名', trigger: 'blur'},
-        { min: 2, message: '请输入两个或以上字符', trigger: 'blur' }
+        {required: true, message: '请输入姓名', trigger: 'change'},
+        { min: 2, message: '请输入两个或以上字符', trigger: 'change' }
     ],
 })
 
@@ -133,10 +136,8 @@ const BeforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 const HandleDelete = (id: number) => {
     axios.delete(`http://localhost:5172/api/AdminInfo/${id}`)
     .then(()=>{
-        Promise.all([
-            tableStore().UpdateAdminInfo(),
-            ElMessage.success("删除成功！")
-        ])
+        admin.UpdateAdminInfo(),
+        ElMessage.success("删除成功！")
     })
     .catch(()=>{
         ElMessage.error("删除失败！")
@@ -159,7 +160,7 @@ const HandleEdit = (row: any) => {
     originalAdmin.phone_number = row.phone_number;
     originalAdmin.email = row.email;
     originalAdmin.avatarUrl = row.image_data;
-
+    
     editDialogVisible.value = true;
 }
 
@@ -187,7 +188,7 @@ const OnSubmit = async(formEl: FormInstance | undefined) => {
         axios.put(`http://localhost:5172/api/AdminAvatars/${adminData.id}`, image)
         .then(() => {
             editDialogVisible.value = false;
-            tableStore().UpdateAdminInfo()
+            admin.UpdateAdminInfo()
             ElMessage.success("修改成功！");
             newAdmin.avatarUrl = ''
         })
@@ -198,15 +199,10 @@ const OnSubmit = async(formEl: FormInstance | undefined) => {
 }
 
 const handleSelectionChange = (selection: []) => {
-    tableStore().selectedRows = selection
+    admin.selectedRows = selection
 };
 
 const HandleReset = () => {
-    newAdmin.id = originalAdmin.id;
-    newAdmin.username = originalAdmin.username;
-    newAdmin.name = originalAdmin.name;
-    newAdmin.phone_number = originalAdmin.phone_number;
-    newAdmin.email = originalAdmin.email;
-    newAdmin.avatarUrl = originalAdmin.avatarUrl;
+    Object.assign(newAdmin, originalAdmin)
 }
 </script>

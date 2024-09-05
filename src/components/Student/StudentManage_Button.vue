@@ -1,6 +1,6 @@
 <template>
     <el-button type="primary" plain :icon="CirclePlus" @click="AddStudent()">新增数据</el-button>
-    <el-button type="danger" plain :icon="Delete" @click="tableStore().DeleteStudentSelectedRows()">批量删除</el-button>
+    <el-button type="danger" plain :icon="Delete" @click="student.DeleteStudentSelectedRows()">批量删除</el-button>
 
     <el-dialog id="dialog" v-model="addDialogVisible" align-center title="新增数据" style="min-width: 300px;" @closed="resetForm(ruleFormRef)">
         <el-form :model="newStudent" label-width="auto" :rules="rules" ref="ruleFormRef" @keyup.enter="OnSubmit(ruleFormRef)">
@@ -31,9 +31,13 @@
                     <el-option v-for="item in classes" :key="item.class_id" :label="item.class_name" :value="item.class_name"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>   
-                <el-button type="primary" @click="OnSubmit(ruleFormRef)">提交</el-button>
-                <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+            <el-form-item>
+                <template #default>
+                        <div style="display:flex; justify-content: center; align-items: center; width: 100%;">
+                            <el-button type="primary" @click="OnSubmit(ruleFormRef)">提交</el-button>
+                            <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+                        </div>
+                </template>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -47,10 +51,11 @@ import {  CirclePlus, Delete, Plus  } from '@element-plus/icons-vue'
 import type { UploadProps, FormRules, FormInstance } from 'element-plus'
 import { ElMessage  } from 'element-plus'
 import axios from 'axios'
-import tableStore from '@/stores/table'
+import { useStudentStore } from '@/stores/StudentStore'
 import type {College, Class, Specialities} from '@/components/Student/Student_InfoTable.vue'
-const buttonWidth = '150px'
 
+const buttonWidth = '150px'
+const student = useStudentStore()
 
 export interface RuleForm {
   id: number,
@@ -197,7 +202,7 @@ const OnSubmit = async (formEl: FormInstance | undefined) => {
 
         Promise.all([
             await axios.post('http://localhost:5172/api/StudentAvatars/upload', imgData),
-            tableStore().UpdateStudentInfo()
+            student.UpdateStudentInfo()
         ]);
 
         resetForm(ruleFormRef.value); // 清空表单

@@ -1,42 +1,68 @@
-import {createRouter,createWebHistory} from 'vue-router'
-import AdminInfo from '@/components/Admin/Admin_Info.vue'
-import Home from '@/components/Home.vue'
-import TeacherInfo from '@/components/Teacher/Teacher_Info.vue'
-import StudentInfo from '@/components/Student/Student_Info.vue'
-import Announce from '@/components/Announce/Announce.vue'
+import Notice from '@/components/Notice/Notice.vue';
+import TestArrangement from '@/components/TestArrangement/TestArrangement.vue';
+import { useLoginStore } from '@/stores/Login';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
-    history:createWebHistory(),
-    routes:[
+    history: createWebHistory(),
+    routes: [
         {
             path: '/',
-            redirect: '/home',
+            redirect: '/login',
         },
         {
-            name:'首页',
-            path:'/home',
-            component: Home,
+            path: '/login',
+            component: () => import('@/components/Login.vue')
+        },
+        {
+            path: '/home',
+            name: '首页',
+            component: () => import('@/components/Home.vue'),
         },
         {
             name: '管理员信息',
             path: '/adminInfo',
-            component: AdminInfo,
+            component: () => import('@/components/Admin/Admin_Info.vue'),
         },
         {
             name: '教师信息',
             path: '/teacherInfo',
-            component: TeacherInfo,
+            component: () => import('@/components/Teacher/Teacher_Info.vue'),
         },
         {
             name: '教务通知',
-            path: '/announce',
-            component: Announce,
+            path: '/notice',
+            component: Notice
         },
         {
             name: '学生信息',
             path: '/studentInfo',
-            component: StudentInfo,
+            component: () => import('@/components/Student/Student_Info.vue'),
         },
+        {
+            name: '个人信息',
+            path: '/adminSelfMes',
+            component: () => import('@/components/Admin/SelfMessage.vue'),
+        },
+        {
+            name: '修改密码',
+            path: '/changePassword',
+            component: () => import('@/components/ChangePassword.vue')
+        },
+        {
+            name: '考试安排',
+            path: '/testArrange',
+            component: TestArrangement
+        }
     ]
-})
-export default router
+});
+
+router.beforeEach((to, from, next) => {
+    const login = useLoginStore();
+    if (to.path !== '/login' && !login.isLoggedIn) {
+      next('/login');
+    } else {
+      next();
+    }
+  });
+export default router;

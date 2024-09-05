@@ -1,5 +1,5 @@
 <template>
-    <el-table :data="tableStore().teacherInfo" :cell-style="{ textAlign: 'center'}" 
+    <el-table :data="teacher.teacherInfo" :cell-style="{ textAlign: 'center'}" 
     :header-cell-style="{ 'text-align': 'center' }" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :header-row-style="{ 'background-color': '#f8f8f8' }"></el-table-column>
         <el-table-column prop="id" label="序号" sortable ></el-table-column>
@@ -58,9 +58,13 @@
             <el-form-item label="职称：" prop="title">
                 <el-input v-model="newTeacher.title" clearable/>
             </el-form-item>
-            <el-form-item>   
-                <el-button type="primary" @click="OnSubmit(refRuleForm)">提交</el-button>
-                <el-button @click="HandleReset()">重置</el-button>
+            <el-form-item>  
+                <template #default>
+                        <div style="display:flex; justify-content: center; align-items: center; width: 100%;">
+                            <el-button type="primary" @click="OnSubmit(refRuleForm)">提交</el-button>
+                            <el-button @click="HandleReset()">重置</el-button>
+                        </div>
+                </template>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -74,11 +78,11 @@ import { Plus } from '@element-plus/icons-vue';
 import { reactive, watch } from 'vue';
 import { ref } from 'vue';
 import type { FormInstance, FormRules, UploadProps} from 'element-plus'
-import tableStore from '@/stores/table'
+import { useTeacherStore } from '@/stores/TeacherStore';
 import '@/assets/css/content.css'
 
 const editDialogVisible = ref(false)
-
+const teacher = useTeacherStore()
 let newTeacher = reactive({
     id: '',
     username: '',
@@ -110,12 +114,12 @@ interface RuleForm {
 const refRuleForm = ref<FormInstance>()
 const rules = reactive<FormRules<RuleForm>>({
     username:[
-        {required: true, message: '请输入用户名', trigger: 'blur'},
-        { min: 3, max: 20, message: '长度在3到12之间', trigger: 'blur' }
+        {required: true, message: '请输入用户名', trigger: 'change'},
+        { min: 3, max: 20, message: '长度在3到20之间', trigger: 'change' }
     ],
     name:[
-        {required: true, message: '请输入姓名', trigger: 'blur'},
-        { min: 2, message: '请输入两个或以上字符', trigger: 'blur' }
+        {required: true, message: '请输入姓名', trigger: 'change'},
+        { min: 2, message: '请输入两个或以上字符', trigger: 'change' }
     ],
 })
 
@@ -141,7 +145,7 @@ const HandleDelete = (id: number) => {
     axios.delete(`http://localhost:5172/api/Teachers/${id}`)
     .then(()=>{
         Promise.all([
-            tableStore().UpdateTeacherInfo(),
+            teacher.UpdateTeacherInfo(),
             ElMessage.success("删除成功！")
         ])
     })
@@ -197,7 +201,7 @@ const OnSubmit = async(formEl: FormInstance | undefined) => {
         .then(() => {
             editDialogVisible.value = false;
             Promise.all([
-                tableStore().UpdateTeacherInfo(),
+                teacher.UpdateTeacherInfo(),
                 ElMessage.success("修改成功！")
             ])
             newTeacher.avatarUrl = ''
@@ -209,7 +213,7 @@ const OnSubmit = async(formEl: FormInstance | undefined) => {
 }
 
 const handleSelectionChange = (selection: []) => {
-    tableStore().selectedRows = selection
+    teacher.selectedRows = selection
 };
 
 const HandleReset = () => {

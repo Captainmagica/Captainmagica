@@ -1,20 +1,20 @@
-<template>
-      <div style="display: flex; margin-bottom: 3px;" >
-        <AnnounceCard style="flex: 1; margin-right: 3px;"></AnnounceCard>
-        <TestArrangement style="flex: 1;"></TestArrangement>
+<template>  
+      <div style="display: flex; margin-bottom: 1px;" >
+        <NoticeCard style="flex: 1; margin-right: 1px;"></NoticeCard>
+        <TestArrangementCard style="flex: 1;"></TestArrangementCard>
       </div>
       <div style="display: flex;">
-        <AttendanceInfo style="flex: 1; margin-right: 3px;"></AttendanceInfo>
+        <AttendanceInfo style="flex: 1; margin-right: 1px;"></AttendanceInfo>
         <GradeStatistic style="flex: 1;" ></GradeStatistic>
       </div>
   </template>
   
   <script lang="ts" setup>
-  import AnnounceCard from './Announce/AnnounceCard.vue';
-  import TestArrangement from './TestArrangement.vue';
-  import AttendanceInfo from './AttendanceInfo.vue';
-  import GradeStatistic from './GradeStatistic.vue';
-  import '../assets/css/content.css';
+import NoticeCard from './Notice/NoticeCard.vue';
+import TestArrangementCard from './TestArrangement/TestArrangementCard.vue';
+import AttendanceInfo from './AttendanceInfo.vue';
+import GradeStatistic from './GradeStatistic.vue';
+import '../assets/css/content.css';
 
 
   </script>

@@ -7,9 +7,7 @@
             </div>
          </template>
          <el-timeline>
-            <el-timeline-item v-for="item in announces" :timestamp="item.time">
-                {{ item.content }}
-            </el-timeline-item>
+            功能开发中
          </el-timeline>
     </el-card>
 </template>

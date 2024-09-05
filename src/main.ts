@@ -4,10 +4,13 @@ import 'element-plus/dist/index.css'
 import App from './App.vue'
 import router from './ruter/router'
 import { createPinia } from 'pinia'
+import { onMounted } from 'vue';
+import { useLoginStore } from './stores/Login'
 const eventBus = createApp({});
 
 const app = createApp(App)
 app.config.globalProperties.$bus = eventBus
+
 app.use(createPinia())
 app.use(router as any)
 app.use(ElementPlus)

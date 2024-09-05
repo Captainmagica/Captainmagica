@@ -1,6 +1,6 @@
 <template>
-    <el-input style="width: 240px; height: 32px;" placeholder="请输入关键字进行查询" v-model="input" @keyup.enter="tableStore().SearchStudent(input)" />
-    <el-button style="margin: 10px;" type="primary" @click="tableStore().SearchStudent(input)" :icon="Search">查询</el-button>
+    <el-input style="width: 240px; height: 32px;" placeholder="请输入关键字进行查询" v-model="input" @keyup.enter="student.SearchStudent(input)" />
+    <el-button style="margin: 10px;" type="primary" @click="student.SearchStudent(input)" :icon="Search">查询</el-button>
     <el-button type="info" style="margin-left: 0;" :icon="RefreshLeft" @click="SearchReset()">重置</el-button>
 </template>
 
@@ -8,11 +8,11 @@
     import '@/assets/css/content.css'
     import { ref } from 'vue'
     import { RefreshLeft, Search } from '@element-plus/icons-vue';
-    import tableStore from '@/stores/table';
+    import { useStudentStore } from '@/stores/StudentStore';
     const input = ref('')
-
+    const student = useStudentStore()
     const SearchReset = () => {
-        tableStore().UpdateStudentInfo()
+        student.UpdateStudentInfo()
         input.value = ''
     }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <el-button type="primary" plain :icon="CirclePlus" @click="addDialogVisible = true">新增数据</el-button>
-    <el-button type="danger" plain :icon="Delete" @click="tableStore().DeleteAdminSelectedRows()">批量删除</el-button>
+    <el-button type="danger" plain :icon="Delete" @click="admin.DeleteAdminSelectedRows()">批量删除</el-button>
 
     <el-dialog id="dialog" v-model="addDialogVisible" align-center title="新增数据" style="min-width: 300px;" @closed="resetForm(ruleFormRef)">
         <el-form :model="newAdmin" label-width="auto" :rules="rules" ref="ruleFormRef" @keyup.enter="OnSubmit(ruleFormRef)">
@@ -10,7 +10,7 @@
             <el-form-item label="姓名：" prop="name">
                 <el-input v-model="newAdmin.name" clearable/>
             </el-form-item>
-            <el-form-item label="电话号码：" prop="phoneNumber">
+            <el-form-item label="电话号码：" prop="phone_number">
                 <el-input v-model="newAdmin.phone_number" clearable/>
             </el-form-item>
             <el-form-item label="头像：">
@@ -23,8 +23,12 @@
                 <el-input v-model="newAdmin.email" clearable/>
             </el-form-item>
             <el-form-item>   
-                <el-button type="primary" @click="OnSubmit(ruleFormRef  )">提交</el-button>
-                <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+                <template #default>
+                        <div style="display:flex; justify-content: center; align-items: center; width: 100%;">
+                            <el-button type="primary" @click="OnSubmit(ruleFormRef)">提交</el-button>
+                            <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+                        </div>
+                </template>     
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -38,12 +42,12 @@ import {  CirclePlus, Delete, Plus  } from '@element-plus/icons-vue'
 import type { UploadProps, FormRules, FormInstance } from 'element-plus'
 import { ElMessage  } from 'element-plus'
 import axios from 'axios'
-import tableStore from '@/stores/table'
+import { useAdminStore } from '@/stores/AdminStore'
 
 const buttonWidth = '150px'
+const admin = useAdminStore()
 
-
-export interface RuleForm {
+export interface AdminRuleForm {
   id: number,
   username: string,
   name: string,
@@ -52,10 +56,10 @@ export interface RuleForm {
   role: string
 }
 
-const rules = reactive<FormRules<RuleForm>>({
+const rules = reactive<FormRules<AdminRuleForm>>({
     username:[
         {required: true, message: '请输入用户名', trigger: 'blur'},
-        { min: 3, max: 20, message: '长度在3到12之间', trigger: 'blur' }
+        { min: 3, max: 20, message: '长度在3到20之间', trigger: 'blur' }
     ],
     name:[
         {required: true, message: '请输入姓名', trigger: 'blur'},
@@ -64,7 +68,7 @@ const rules = reactive<FormRules<RuleForm>>({
 })
 
 let addDialogVisible = ref(false)
-let newAdmin = reactive(<RuleForm>({
+let newAdmin = reactive(<AdminRuleForm>({
     id: 0,
     username: '',
     name: '',
@@ -130,7 +134,7 @@ const OnSubmit = async (formEl: FormInstance | undefined) => {
 
         Promise.all([
             await axios.post('http://localhost:5172/api/AdminAvatars/upload', imgData),
-            tableStore().UpdateAdminInfo()
+            admin.UpdateAdminInfo()
         ]);
 
         resetForm(ruleFormRef.value); // 清空表单
